@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@100;300;400;500;700;800;900&display=swap"
+    rel="stylesheet">
+  <title>Document</title>
+  <style>
+    body {
+      background-image: url(https://burst.shopifycdn.com/photos/flag-on-a-wooden-stick-in-the-sand.jpg?width=1850&format=pjpg&exif=1&iptc=1);
+      font-family: 'M PLUS 1p', sans-serif;
+      background-size: 100%;
+    }
+
+    table {
+      width: 350px;
+      height: 500px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      margin: auto;
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.13);
+      border-spacing: 20px;
+      box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+    }
+
+    td {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      text-align: center;
+      vertical-align: middle;
+      box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      border: 0;
+    }
+
+    td:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+
+    #text {
+      text-align: right;
+      border-radius: 8px;
+      cursor: inherit;
+    }
+
+    #zero,
+    #plus,
+    #eq {
+      border-radius: 20px;
+    }
+
+    #cancel {
+      background: rgba(172, 5, 5, 0.2);
+    }
+
+    .btn {
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+    }
+
+    .btn:hover {
+      background: rgba(0, 0, 0, 0.9);
+    }
+  </style>
+</head>
+
+<body>
+  <table border="1">
+    <tr>
+      <td colspan="4" id="text">0</td>
+    </tr>
+    <tr>
+      <td id="cancel">C</td>
+      <td class="btn">/</td>
+      <td class="btn">*</td>
+      <td class="btn">-</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>8</td>
+      <td>9</td>
+      <td rowspan="2" id="plus" class="btn">+</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td rowspan="2" id="eq" class="btn"> = </td>
+    </tr>
+    <tr>
+      <td colspan="2" id="zero">0</td>
+      <td>.</td>
+    </tr>
+  </table>
+  <script>
+    const text = document.getElementById('text')
+    const btns = document.querySelectorAll('td:not(#text)')
+
+    for (const btn of btns) {
+      btn.addEventListener('click', () => {
+        const btnText = btn.innerText
+        const operators = ['+', '-', '*', '/']
+        const lastText = text.innerText[text.innerText.length - 1]
+        // 如果按的鍵是 =
+        if (btnText === '=') {
+          // 如果最後一個字不是運算子，才計算
+          if (!operators.includes(lastText)) {
+            text.innerText = eval(text.innerText)
+          }
+        }
+        // 如果按 C，歸 0
+        else if (btnText === 'C') {
+          text.innerText = '0'
+        }
+        // 如果現在是 0，按的是數字，把文字取代
+        else if (text.innerText === '0' && !isNaN(parseInt(btnText))) {
+          text.innerText = btnText
+        }
+        // 如果最後一個字是運算子
+        else if (operators.includes(lastText)) {
+          // 現在按的不是運算子，才加上去
+          if (!operators.includes(btnText)) {
+            text.innerText += btnText
+          }
+        }
+        // 如果按的是 .
+        else if (btnText === '.') {
+          let canAddDot = true
+          // 從最後一個字往前跑迴圈
+          for (let i = text.innerText.length - 1; i >= 0; i--) {
+            // 如果先遇到運算子，一定可以加 .
+            if (operators.includes(text.innerText[i])) break
+            // 如果先遇到 .，一定不能加 .
+            if (text.innerText[i] === '.') {
+              canAddDot = false
+              break
+            }
+          }
+          // 迴圈完可以加才
+          if (canAddDot) text.innerText += '.'
+        }
+        // 如果最後一個字不是運算子，加上去
+        else {
+          text.innerText += btnText
+        }
+      })
+    }
+
+    document.addEventListener('keydown', event => {
+      const btnText = event.key
+      const operators = ['+', '-', '*', '/']
+      const lastText = text.innerText[text.innerText.length - 1]
+      // 如果按的鍵是 =
+      if (btnText === '=' || btnText === 'Enter') {
+        // 如果最後一個字不是運算子，才計算
+        if (!operators.includes(lastText)) {
+          text.innerText = eval(text.innerText)
+        }
+      }
+      // 如果按 C，歸 0
+      else if (btnText === 'c') {
+        text.innerText = '0'
+      }
+      // 如果現在是 0，按的是數字，把文字取代
+      else if (text.innerText === '0' && !isNaN(parseInt(btnText))) {
+        text.innerText = btnText
+      }
+      // 如果最後一個字是運算子
+      else if (operators.includes(lastText)) {
+        // 現在按的不是運算子，且是數字才加上去
+        if (!operators.includes(btnText) && !isNaN(parseInt(btnText))) {
+          text.innerText += btnText
+        }
+      }
+      // 如果最後一個字不是運算子，且按的是數字或運算子，加上去
+      else if (!isNaN(parseInt(btnText)) || operators.includes(btnText)) {
+        text.innerText += btnText
+      }
+      // 如果按的是 .
+      else if (btnText === '.') {
+        let canAddDot = true
+        // 從最後一個字往前跑迴圈
+        for (let i = text.innerText.length - 1; i >= 0; i--) {
+          // 如果先遇到運算子，一定可以加 .
+          if (operators.includes(text.innerText[i])) break
+          // 如果先遇到 .，一定不能加 .
+          if (text.innerText[i] === '.') {
+            canAddDot = false
+            break
+          }
+        }
+        // 迴圈完可以加才
+        if (canAddDot) text.innerText += '.'
+      }
+    })
+
+  </script>
+</body>
+
+</html>
